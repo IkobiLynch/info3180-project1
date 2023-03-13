@@ -6,7 +6,8 @@ This file contains the routes for your application.
 """
 
 from app import app
-from flask import render_template, request, redirect, url_for
+from flask import flash, render_template, request, redirect, session, url_for
+from app.forms import PropertyForm
 
 
 ###
@@ -23,6 +24,27 @@ def home():
 def about():
     """Render the website's about page."""
     return render_template('about.html', name="Mary Jane")
+
+@app.route('/properties/create/', methods=['POST', 'GET'])
+def create_property(): #Display the form to add a new property
+    form = PropertyForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        #Save to databse
+
+        flash("Listing Created!")
+        #print(session.get('_flashes', []))
+        return redirect(url_for('view_properties'))
+
+    return render_template('create.html', form=form)
+
+@app.route('/properties')
+def view_properties(): #Display a list of all properties in the databse
+    return render_template('properties.html')
+
+@app.route('/properties/<propertyid>')
+def view_property(propertyid): #View individual property using property id.
+    return render_template('property.html', propertyid=1)
 
 
 ###
