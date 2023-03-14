@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 class Property(db.Model):
     __tablename__='property'
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100))
     bedroom_number = db.Column(db.Integer)
     location = db.Column(db.String(100))

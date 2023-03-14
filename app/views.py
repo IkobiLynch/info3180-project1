@@ -5,9 +5,14 @@ Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file contains the routes for your application.
 """
 
+import os
 from app import app
-from flask import flash, render_template, request, redirect, session, url_for
+from flask import flash, render_template, request, redirect, send_from_directory, session, url_for
 from app.forms import PropertyForm
+from app.models import Property, db
+from werkzeug.utils import secure_filename
+from flask_sqlalchemy import SQLAlchemy
+
 
 
 ###
@@ -30,21 +35,58 @@ def create_property(): #Display the form to add a new property
     form = PropertyForm()
 
     if request.method == 'POST' and form.validate_on_submit():
-        #Save to databse
+        #Create a property instance using the form data
+        new_property = Property(
+            title = form.title.data,
+            bedroom_number = form.bedroom_number.data,
+            location = form.location.data,
+            price = form.price.data,
+            type = form.type.data, 
+            description = form.description.data,
+            photo = secure_filename(form.photo.data.filename)
+        )
+
+        #Add new property to database and commit change
+        db.session.add(new_property)
+        db.session.commit()
+
+        #Save the upload photo to the uploads folder
+        photo = form.photo.data
+        filename = photo.filename
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
 
         flash("Listing Created!")
         #print(session.get('_flashes', []))
         return redirect(url_for('view_properties'))
+    else:
+        flash_errors(form)
 
     return render_template('create.html', form=form)
 
 @app.route('/properties')
 def view_properties(): #Display a list of all properties in the databse
-    return render_template('properties.html')
+    all_properties = Property.query.all()
+    return render_template('properties.html', all_properties=all_properties)
 
 @app.route('/properties/<propertyid>')
 def view_property(propertyid): #View individual property using property id.
-    return render_template('property.html', propertyid=1)
+    data = Property.query.filter_by(id=propertyid).first()
+    return render_template('property.html', data=data)
+
+@app.route('/uploads/<filename>')
+def getimage(filename):
+    return send_from_directory(os.path.join(os.getcwd(),app.config['UPLOAD_FOLDER']), filename)
+
+def get_upload_images():
+    filename=[]
+    rootdir = os.getcwd()
+    print (rootdir)
+    for subdir, dirs, files in os.walk(rootdir + '/uploads'):
+        for file in files:
+            filename+=[file]
+            print (os.path.join(subdir, file))
+    return filename
 
 
 ###

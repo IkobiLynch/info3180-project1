@@ -1,0 +1,40 @@
+{%extends "base.html"%}
+{%block main%}
+<h1>PROPERTY</h1>
+
+<div class="img-com1">
+    <div class="card1">
+        <section class="top">
+            <img src="{{url_for('getimage',filename=data.photo)}}" alt="images" id="img1">
+        </section>
+        <section class="data">
+            <div> <h3>{{data.title}}</h3></div>
+            <div id="pri-type"> 
+                <div id="pri">
+                    <p>${{data.price}}</p>
+                </div>
+                <div id="typ">
+                    {{data.type}}
+
+                </div>
+            </div>
+            <div> {{data.description}}</div>
+            <div id="bed-bath">
+                <div id="bed">
+                    <p><img src="/static/bed.png" class="icon">  {{data.bednum}} Bedrooms</p>
+                </div>
+                <div id="bath">
+                    <p><img src="/static/shower.png" class="icon">  {{data.bednum}} Bathrooms</p>
+                </div>
+            </div>
+            <div><p><img src="/static/location.png" class="icon">  {{data.location}}</p></div>
+            <button id="email">Email Realtor</button>     
+        </section> 
+        
+  
+     </div>
+</div>
+
+
+
+{%endblock%}
